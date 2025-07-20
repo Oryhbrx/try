@@ -3,89 +3,155 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>Escape the Maze!</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: #000;
+  <title>nakakainis Maze</title>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: #000000; /* black background */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  h1 {
+    color: #ffffff;
+    text-align: center;
+    margin: 10px;
+  }
+  #levelHint {
+    color: #ffb3c6;
+    font-size: 1.1rem;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  canvas {
+    border: 3px solid #111;
+    background: #111; /* dark canvas background */
+    touch-action: none;
+  }
+      .dpad {
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 20px;
-      touch-action: manipulation;
+      margin-top: 20px;
     }
-    h1 {
-      color: #fff;
-      text-align: center;
-      margin: 10px;
+    .dpad-row {
+      display: flex;
+      gap: 65px;
     }
-    #levelHint {
-      color: #ffb3c6;
-      font-size: 1.1rem;
-      text-align: center;
-      margin-bottom: 10px;
+    .dpad button {
+      font-size: 3rem;
+      width: 64px;
+      height: 64px;
+      background: #444343;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
     }
-    canvas {
-      border: 3px solid #111;
-      background: #111;
-      touch-action: none;
-    }
-.dpad {
-  margin-top: 30px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.dpad-row {
-  display: flex;
-}
-.dpad button {
-  width: 80px;
-  height: 80px;
-  margin: 8px;
-  font-size: 2rem;
-  background: #222;
-  color: white;
-  border: 3px solid #555;
-  border-radius: 12px;
-  cursor: pointer;
-}
-.dpad button:active {
-  background: #555;
-}
-  </style>
+  #rewardPopup {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #000;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
+  #rewardPopup img {
+    max-width: 95vw;
+    max-height: 80vh;
+    border: 12px solid #111;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+  }
+  .navArrows {
+    display: flex;
+    justify-content: space-between;
+    width: 90%;
+    max-width: 500px;
+    margin-top: 15px;
+  }
+  .navArrows button {
+    font-size: 1.5rem;
+    background: #ff4081;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  #closeBtn {
+    margin-top: 10px;
+    background: #888;
+    color: white;
+    font-size: 1.1rem;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  #winMessage {
+    font-size: 1.3rem;
+    color: #ffb3c6;
+    margin-top: 10px;
+    display: none;
+  }
+</style>
 </head>
 <body>
   <h1>Escape the Maze!</h1>
   <div id="levelHint"></div>
   <canvas id="gameCanvas" width="640" height="640"></canvas>
-
-  <!-- Directional Buttons -->
-  <div class="dpad">
-    <div class="dpad-row">
-      <button onclick="movePlayer(0, -1)">↑</button>
-    </div>
+    <div class="dpad">
+    <div><button onclick="movePlayer(0, -1)">⬆</button></div>
     <div class="dpad-row">
       <button onclick="movePlayer(-1, 0)">⬅</button>
       <button onclick="movePlayer(1, 0)">➡</button>
     </div>
-    <div class="dpad-row">
-      <button onclick="movePlayer(0, 1)">↓</button>
-    </div>
+    <div><button onclick="movePlayer(0, 1)">⬇</button></div>
   </div>
+  <div id="winMessage">You escaped the maze!</div>
+
+  <div id="rewardPopup">
+    <img id="rewardImage" src="photo2.png" alt="Reward Image" />
+    <div class="navArrows">
+      <button onclick="prevImage()">⬅ Prev</button>
+      <button onclick="nextImage()">Next ➡</button>
+    </div>
+    <button id="closeBtn" onclick="closeRewardPopup()">✖ Close</button>
+  </div>
+
+  <img id="princess" src="princess.png" style="display:none;" />
 
   <script>
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
+    const princess = document.getElementById('princess');
     const tileSize = 32;
     const rows = 20, cols = 20;
+    let level = 0;
+
+    const hints = [
+      "A gentle start. Learn the path and spot the yellow exit. Adventure begins!",
+      "Things get deeper. Hidden resets and paths await—don't get sent back!",
+      "Invisible traps and tricky turns await. Watch your steps—and your memory!"
+    ];
+
+    const rewardImages = ['photo2.png', 'photo3.png', 'photo4.png', 'photo5.png'];
+    let currentRewardIndex = 0;
+
     const player = { x: 1, y: 1 };
 
-    const levelHint = document.getElementById("levelHint");
-    levelHint.textContent = "A gentle start. Learn the path and spot the yellow exit. Adventure begins!";
-
-    const maze = [
+        const levels = [
+    [
       [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
       [1,0,0,1,0,0,0,1,0,0,0,0,4,0,0,0,0,0,2,1],
       [1,1,0,1,0,1,0,1,0,1,1,1,0,1,0,1,0,1,5,1],
@@ -152,44 +218,136 @@
     [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]
 ]
   ]; 
+    let maze = JSON.parse(JSON.stringify(levels[level]));
 
-    function drawMaze() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      for (let y = 0; y < rows; y++) {
-        for (let x = 0; x < cols; x++) {
-          const tile = maze[y][x];
-          if (tile === 4 || tile === 5 || tile === 6) continue;
-          ctx.fillStyle = (tile === 1 || tile === 7) ? '#444' : (tile === 2 ? '#ff0' : (tile === 3 ? '#0f0' : '#111'));
-          ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+    function updateLevelHint() {
+      document.getElementById("levelHint").textContent = hints[level] || "";
+    }
+
+function drawMaze() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      const tile = maze[y][x];
+      if (tile === 4 || tile === 5 || tile === 6) continue; // skip invisible triggers
+      switch (tile) {
+        case 1: ctx.fillStyle = '#444'; break;      // Walls - dark gray
+        case 2: ctx.fillStyle = '#ffeb3b'; break;   // Exit - yellow
+        case 3: ctx.fillStyle = '#008000'; break;   // Teleport - pink
+        case 7: ctx.fillStyle = '#444'; break;      // (7) closed path - almost black
+        default: ctx.fillStyle = '#111'; break;     // Floor - very dark
+      }
+      ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+    }
+  }
+  ctx.drawImage(princess, player.x * tileSize, player.y * tileSize, tileSize, tileSize);
+}
+
+    function findAnotherTeleportSpot(x, y) {
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          if ((r !== y || c !== x) && maze[r][c] === 3) {
+            return { x: c, y: r };
+          }
         }
       }
-      ctx.fillStyle = '#ff69b4';
-      ctx.beginPath();
-      ctx.arc(player.x * tileSize + tileSize / 2, player.y * tileSize + tileSize / 2, tileSize / 2.5, 0, 2 * Math.PI);
-      ctx.fill();
+      return null;
     }
 
     function movePlayer(dx, dy) {
       const newX = player.x + dx;
       const newY = player.y + dy;
-      if (maze[newY][newX] !== 1 && maze[newY][newX] !== 7) {
-        if (maze[newY][newX] === 5) {
-          player.x = 1; player.y = 1;
-        } else {
-          player.x = newX;
-          player.y = newY;
-          if (maze[newY][newX] === 6) {
-            for (let y = 0; y < rows; y++) {
-              for (let x = 0; x < cols; x++) {
-                if (maze[y][x] === 7) maze[y][x] = 0;
-              }
-            }
+     if (
+  newX >= 0 && newY >= 0 && newX < cols && newY < rows &&
+  maze[newY][newX] !== 1 && maze[newY][newX] !== 7
+) {
+        if (maze[newY][newX] === 4) {
+          const px = newX + dx, py = newY + dy;
+          if (px >= 0 && py >= 0 && px < cols && py < rows && maze[py][px] === 0) {
+            maze[py][px] = 1;
           }
         }
+
+        player.x = newX;
+        player.y = newY;
+
+        if (maze[newY][newX] === 3) {
+          const tp = findAnotherTeleportSpot(newX, newY);
+          if (tp) { player.x = tp.x; player.y = tp.y; }
+        } else if (maze[newY][newX] === 5) {
+  player.x = 1; player.y = 1;
+} else if (maze[newY][newX] === 6) {
+  // Open all 7s in the maze
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (maze[r][c] === 7) {
+        maze[r][c] = 0;
+      }
+    }
+  }
+}
         drawMaze();
+
+        if (maze[player.y][player.x] === 2) {
+          if (level === levels.length - 1) {
+            showRewardPopup();
+          } else {
+            level++;
+            maze = JSON.parse(JSON.stringify(levels[level]));
+            player.x = 1; player.y = 1;
+            updateLevelHint();
+            drawMaze();
+          }
+        }
       }
     }
 
+    function showRewardPopup() {
+      document.getElementById('winMessage').style.display = 'block';
+      document.getElementById('rewardPopup').style.display = 'flex';
+      document.getElementById('rewardImage').src = rewardImages[currentRewardIndex];
+    }
+
+    function closeRewardPopup() {
+      document.getElementById('rewardPopup').style.display = 'none';
+    }
+
+    function nextImage() {
+      currentRewardIndex = (currentRewardIndex + 1) % rewardImages.length;
+      document.getElementById('rewardImage').src = rewardImages[currentRewardIndex];
+    }
+
+    function prevImage() {
+      currentRewardIndex = (currentRewardIndex - 1 + rewardImages.length) % rewardImages.length;
+      document.getElementById('rewardImage').src = rewardImages[currentRewardIndex];
+    }
+
+    document.addEventListener('keydown', (e) => {
+      switch (e.key) {
+        case 'ArrowUp': movePlayer(0, -1); break;
+        case 'ArrowDown': movePlayer(0, 1); break;
+        case 'ArrowLeft': movePlayer(-1, 0); break;
+        case 'ArrowRight': movePlayer(1, 0); break;
+      }
+    });
+
+    let touchStartX = 0, touchStartY = 0;
+    canvas.addEventListener('touchstart', e => {
+      const touch = e.touches[0];
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+    });
+    canvas.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      const dy = e.changedTouches[0].clientY - touchStartY;
+      if (Math.abs(dx) > Math.abs(dy)) {
+        movePlayer(dx > 0 ? 1 : -1, 0);
+      } else {
+        movePlayer(0, dy > 0 ? 1 : -1);
+      }
+    });
+
+    updateLevelHint();
     drawMaze();
   </script>
 </body>
