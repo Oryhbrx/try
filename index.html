@@ -41,12 +41,12 @@
     }
     .dpad-row {
       display: flex;
-      gap: 100px;
+      gap: 150px;
     }
     .dpad button {
-      font-size: 2rem;
-      width: 64px;
-      height: 64px;
+      font-size: 3rem;
+      width: 170px;
+      height: 60px;
       background: #444343;
       color: white;
       border: none;
@@ -111,12 +111,12 @@
   <div id="levelHint"></div>
   <canvas id="gameCanvas" width="640" height="640"></canvas>
     <div class="dpad">
-    <div><button onclick="movePlayer(0, -1)">⬆</button></div>
+    <div><button onclick="movePlayer(0, -1)">↑</button></div>
     <div class="dpad-row">
-      <button onclick="movePlayer(-1, 0)">⬅</button>
-      <button onclick="movePlayer(1, 0)">➡</button>
+      <button onclick="movePlayer(-1, 0)">←</button>
+      <button onclick="movePlayer(1, 0)">→</button>
     </div>
-    <div><button onclick="movePlayer(0, 1)">⬇</button></div>
+    <div><button onclick="movePlayer(0, 1)">↓</button></div>
   </div>
   <div id="winMessage">You escaped the maze!</div>
 
