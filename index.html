@@ -31,29 +31,29 @@
       background: #111;
       touch-action: none;
     }
-    .dpad {
-      margin-top: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .dpad-row {
-      display: flex;
-    }
-    .dpad button {
-      width: 60px;
-      height: 60px;
-      margin: 5px;
-      font-size: 1.5rem;
-      background: #222;
-      color: white;
-      border: 2px solid #555;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-    .dpad button:active {
-      background: #555;
-    }
+.dpad {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.dpad-row {
+  display: flex;
+}
+.dpad button {
+  width: 80px;
+  height: 80px;
+  margin: 8px;
+  font-size: 2rem;
+  background: #222;
+  color: white;
+  border: 3px solid #555;
+  border-radius: 12px;
+  cursor: pointer;
+}
+.dpad button:active {
+  background: #555;
+}
   </style>
 </head>
 <body>
@@ -85,7 +85,7 @@
     const levelHint = document.getElementById("levelHint");
     levelHint.textContent = "A gentle start. Learn the path and spot the yellow exit. Adventure begins!";
 
-        const levels = [
+    const maze = [
       [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
       [1,0,0,1,0,0,0,1,0,0,0,0,4,0,0,0,0,0,2,1],
       [1,1,0,1,0,1,0,1,0,1,1,1,0,1,0,1,0,1,5,1],
