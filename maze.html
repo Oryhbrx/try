@@ -119,7 +119,6 @@
     <div><button onclick="movePlayer(0, 1)">↓</button></div>
   </div>
   <div id="winMessage">You escaped the maze!</div>
-<button id="exitBtn" onclick="parent.closeFolder('gameApp')">⏹ Exit Game</button>
   <div id="rewardPopup">
     <img id="rewardImage" src="photo1.png" alt="Reward Image" />
     <div class="navArrows">
@@ -346,6 +345,7 @@ function drawMaze() {
         movePlayer(0, dy > 0 ? 1 : -1);
       }
     });
+
 
     updateLevelHint();
     drawMaze();
