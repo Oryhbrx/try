@@ -2,113 +2,51 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>🎂 Birthday Maze Unlock</title>
+  <title>🎂 Happy Birthday</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    * { box-sizing: border-box; }
     body {
-      font-family: sans-serif;
-      background: #111;
       margin: 0;
-      padding: 0;
-      overflow: hidden;
-      color: white;
-      text-align: center;
-    }
-
-    #gameContainer, #fileManagerApp {
-      display: none;
-      width: 100vw;
-      height: 100vh;
-    }
-
-    #gameContainer iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-
-    #unlockScreen {
+      background: #f0f0f0;
+      font-family: sans-serif;
       display: flex;
-      flex-direction: column;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       height: 100vh;
-      background: #000;
-      color: white;
-      text-align: center;
-      padding: 20px;
+      overflow: hidden;
+      flex-direction: column;
     }
-
-    #unlockScreen button {
-      background: #ff4081;
-      color: white;
+    .game-button {
       font-size: 1.5rem;
-      padding: 15px 30px;
-      border: none;
+      padding: 16px 32px;
       border-radius: 10px;
-      cursor: pointer;
-      margin-top: 30px;
-    }
-
-    #exitGameBtn {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      z-index: 9999;
+      border: none;
       background: #ff4081;
       color: white;
-      border: none;
-      padding: 10px 20px;
-      font-size: 1rem;
-      border-radius: 8px;
+      cursor: pointer;
+    }
+    .hidden {
       display: none;
     }
-
-    iframe {
-      border: none;
+    .file-manager-link {
+      margin-top: 30px;
+      font-size: 1.2rem;
+      color: green;
+      text-decoration: none;
+      display: none;
     }
   </style>
 </head>
 <body>
-
-  <!-- Unlock Page -->
-  <div id="unlockScreen">
-    <h1>🎮 Play the Maze Game</h1>
-    <p>To unlock your birthday surprise,<br> you must win the game first. 🧩</p>
-    <button onclick="startGame()">▶ Start Game</button>
-  </div>
-
-  <!-- Game Container -->
-  <div id="gameContainer">
-    <button id="exitGameBtn" onclick="exitGame()">✖ Exit Game</button>
-    <iframe id="gameFrame" src="maze.html"></iframe>
-  </div>
-
-  <!-- File Manager App (UNLOCKED after game win) -->
-  <iframe id="fileManagerApp" src="filemanager.html"></iframe>
+  <h1>🎉 Unlock the Birthday Surprise!</h1>
+  <button class="game-button" onclick="location.href='maze.html'">🎮 Play Maze Game</button>
+  <a id="fileManagerLink" href="filemanager.html" class="file-manager-link">📁 Open Birthday File Manager</a>
 
   <script>
-    function startGame() {
-      document.getElementById("unlockScreen").style.display = "none";
-      document.getElementById("gameContainer").style.display = "block";
-      document.getElementById("exitGameBtn").style.display = "block";
+    // Check if game is already won
+    if (localStorage.getItem('gameWon') === 'true') {
+      document.getElementById('fileManagerLink').style.display = 'block';
     }
-
-    function unlockApp() {
-      document.getElementById("gameContainer").style.display = "none";
-      document.getElementById("fileManagerApp").style.display = "block";
-      document.getElementById("exitGameBtn").style.display = "none";
-    }
-
-    function exitGame() {
-      document.getElementById("gameContainer").style.display = "none";
-      document.getElementById("unlockScreen").style.display = "flex";
-      document.getElementById("exitGameBtn").style.display = "none";
-    }
-
-    // Called from inside maze.html when user finishes the game
-    window.unlockPhotos = unlockApp;
   </script>
 </body>
 </html>
