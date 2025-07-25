@@ -2,113 +2,144 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>🎂 Birthday Maze Unlock</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Princess Regine's Pixel Maze</title>
   <style>
-    * { box-sizing: border-box; }
     body {
-      font-family: sans-serif;
-      background: #111;
       margin: 0;
-      padding: 0;
-      overflow: hidden;
+      background-color: black;
       color: white;
-      text-align: center;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      overflow: hidden;
     }
-
-    #gameContainer, #fileManagerApp {
-      display: none;
+    canvas {
+      display: block;
+      margin: auto;
+      background-color: #111;
+      border: 5px solid pink;
+    }
+    #winMessage {
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100vw;
       height: 100vh;
-    }
-
-    #gameContainer iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-
-    #unlockScreen {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      background: #000;
-      color: white;
-      text-align: center;
-      padding: 20px;
-    }
-
-    #unlockScreen button {
-      background: #ff4081;
-      color: white;
-      font-size: 1.5rem;
-      padding: 15px 30px;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      margin-top: 30px;
-    }
-
-    #exitGameBtn {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      z-index: 9999;
-      background: #ff4081;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      font-size: 1rem;
-      border-radius: 8px;
+      background-color: rgba(0, 0, 0, 0.9);
       display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 1000;
     }
-
-    iframe {
+    #rewardPopup h1 {
+      font-size: 3rem;
+      color: #ff69b4;
+      margin-bottom: 20px;
+    }
+    #rewardPopup button {
+      font-size: 2rem;
+      padding: 20px 40px;
+      background: #ff4081;
+      color: white;
       border: none;
+      border-radius: 20px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
+  <canvas id="mazeCanvas" width="672" height="672"></canvas> <!-- 21 tiles * 32px each -->
 
-  <!-- Unlock Page -->
-  <div id="unlockScreen">
-    <h1>🎮 Play the Maze Game</h1>
-    <p>To unlock your birthday surprise,<br> you must win the game first. 🧩</p>
-    <button onclick="startGame()">▶ Start Game</button>
+  <div id="winMessage">
+    <div id="rewardPopup">
+      <h1>🎉 CONGRATULATIONS!</h1>
+      <button onclick="openReward()">🎁 Open Reward</button>
+    </div>
   </div>
-
-  <!-- Game Container -->
-  <div id="gameContainer">
-    <button id="exitGameBtn" onclick="exitGame()">✖ Exit Game</button>
-    <iframe id="gameFrame" src="maze.html"></iframe>
-  </div>
-
-  <!-- File Manager App (UNLOCKED after game win) -->
-  <iframe id="fileManagerApp" src="filemanager.html"></iframe>
 
   <script>
-    function startGame() {
-      document.getElementById("unlockScreen").style.display = "none";
-      document.getElementById("gameContainer").style.display = "block";
-      document.getElementById("exitGameBtn").style.display = "block";
+    const canvas = document.getElementById("mazeCanvas");
+    const ctx = canvas.getContext("2d");
+    const tileSize = 32;
+
+           const levels = [
+[
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,0,1],
+    [1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1],
+    [1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,0,1],
+    [1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1],
+    [1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,0,1],
+    [1,0,4,0,0,0,0,0,4,0,0,0,0,0,0,5,2,1,0,1],
+    [1,0,1,1,1,0,1,1,1,5,1,1,1,1,1,1,1,1,0,1],
+    [1,0,0,0,0,0,0,0,5,0,5,0,0,0,0,0,0,0,0,1],
+    [1,0,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,0,1],
+    [1,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,1,0,1],
+    [1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,0,1],
+    [1,4,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,1,0,1],
+    [1,0,7,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,0,1],
+    [1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,3,1,0,1],
+    [1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1],
+    [1,3,0,0,0,0,0,0,0,0,0,0,0,0,0,4,6,0,0,1],
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]
+]
+  ];
+
+    let player = { x: 1, y: 1 };
+
+    function drawLevel() {
+      for (let y = 0; y < level.length; y++) {
+        for (let x = 0; x < level[y].length; x++) {
+          const tile = level[y][x];
+          ctx.fillStyle = tile === 1 ? "#333" : tile === 2 ? "gold" : "#000";
+          ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+        }
+      }
+      ctx.fillStyle = "deeppink";
+      ctx.beginPath();
+      ctx.arc(
+        player.x * tileSize + tileSize / 2,
+        player.y * tileSize + tileSize / 2,
+        tileSize / 2.5,
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
     }
 
-    function unlockApp() {
-      document.getElementById("gameContainer").style.display = "none";
-      document.getElementById("fileManagerApp").style.display = "block";
-      document.getElementById("exitGameBtn").style.display = "none";
+    function movePlayer(dx, dy) {
+      const newX = player.x + dx;
+      const newY = player.y + dy;
+      if (level[newY][newX] !== 1) {
+        player.x = newX;
+        player.y = newY;
+        drawLevel();
+        checkGoal();
+      }
     }
 
-    function exitGame() {
-      document.getElementById("gameContainer").style.display = "none";
-      document.getElementById("unlockScreen").style.display = "flex";
-      document.getElementById("exitGameBtn").style.display = "none";
+    function checkGoal() {
+      if (level[player.y][player.x] === 2) {
+        document.getElementById("winMessage").style.display = "flex";
+      }
     }
 
+    function openReward() {
+      window.location.href = "https://oryhbrx.github.io/HappyBirthday/";
+    }
 
-    window.unlockPhotos = unlockApp;
+    window.addEventListener("keydown", (e) => {
+      switch (e.key) {
+        case "ArrowUp": movePlayer(0, -1); break;
+        case "ArrowDown": movePlayer(0, 1); break;
+        case "ArrowLeft": movePlayer(-1, 0); break;
+        case "ArrowRight": movePlayer(1, 0); break;
+      }
+    });
+
+    drawLevel();
   </script>
 </body>
 </html>
